@@ -30,6 +30,7 @@ import {
   createPublicClient,
   createWalletClient,
   custom,
+  getAddress,
   http,
   keccak256,
   namehash,
@@ -102,15 +103,17 @@ export const PARENT_NAME = "gomigo.eth";
  * Registered host operator address (the demo host). In production this is the
  * account that ENSv2 EAC has granted the scoped write role on its bin subname.
  */
-export const HOST_OPERATOR_ADDRESS: Address =
-  "0x1D2e4A9c9C3E7A0F2B5C6d7E8f90A1b2C3d4E5f6";
+export const HOST_OPERATOR_ADDRESS: Address = getAddress(
+  "0x1d2e4a9c9c3e7a0f2b5c6d7e8f90a1b2c3d4e5f6",
+);
 
 /**
  * Registered gig-collector address. Granted a constrained ENSv2 EAC role that
  * may only reset bin-status to AVAILABLE after emptying a bin.
  */
-export const COLLECTOR_ADDRESS: Address =
-  "0x9aB7cD3e5F1234567890AbCdEf1234567890AbCd";
+export const COLLECTOR_ADDRESS: Address = getAddress(
+  "0x9ab7cd3e5f1234567890abcdef1234567890abcd",
+);
 
 // ENSv2 wildcard resolution mirrors the classic resolver text-record interface,
 // so we can read via `resolve(name, calldata)` on the UniversalResolver or, when a

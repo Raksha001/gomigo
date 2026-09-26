@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --frame: #d9dde3;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(228, 248, 67, 0.18), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255, 93, 162, 0.14), transparent 45%),
+    #cdd3da;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Chunky comic underline used on section titles */
+.comic-title {
+  text-shadow: 2px 2px 0 rgba(33, 33, 33, 0.12);
+}
+
+/* Halftone dot texture for arcade panels */
+.halftone {
+  background-image: radial-gradient(rgba(33, 33, 33, 0.14) 1.4px, transparent 1.5px);
+  background-size: 10px 10px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Press-down interaction for chunky comic buttons */
+.press {
+  transition:
+    transform 0.06s ease,
+    box-shadow 0.06s ease;
+}
+.press:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 0 #212121 !important;
+}

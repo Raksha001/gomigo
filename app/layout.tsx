@@ -19,7 +19,7 @@ const body = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "GomiGo ゴミゴー — Unlock Tokyo's bins",
+  title: "GomiGo 芥 — Unlock Tokyo's bins",
   description:
     "GomiGo turns Tokyo's locked private dumpsters into a trustless public utility. Verify you're human with World ID, get a 10-minute gate PIN, and drop your trash. Hosts earn, collectors get gigs, ENSv2 runs the registry.",
 };

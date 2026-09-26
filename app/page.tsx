@@ -12,7 +12,7 @@ export default function Landing() {
         <div className="relative">
           <div className="flex items-center justify-between">
             <span className="rounded-full border-2 border-ink bg-white px-3 py-1 font-display text-xs font-extrabold">
-              GOMIGO ゴミゴー
+              GOMIGO 芥
             </span>
             <span className="rounded-full border-2 border-ink bg-ink px-3 py-1 font-display text-[11px] font-extrabold text-lime">
               ETHGlobal Tokyo

@@ -61,7 +61,7 @@ Adopt a Japanese civic utility / environmental transit dashboard aesthetic (insp
 Create a single-page app with a floating pill-bar switcher:
 
 1. **Header:**
-   - Pill status: `GOMIGO ゴミゴー` • `📍 Shibuya, Tokyo` • Badge: `ENSv2 Sepolia`.
+   - Pill status: `GOMIGO 芥` • `📍 Shibuya, Tokyo` • Badge: `ENSv2 Sepolia`.
 2. **Navigation Tabs:**
    - `[ Disposer (Tourist Map) ]` and `[ Host Console ]`
 3. **Tab 1: Disposer View:**

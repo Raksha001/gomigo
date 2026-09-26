@@ -1,4 +1,4 @@
-# GomiGo ゴミゴー 🗑️
+# GomiGo 芥 🗑️
 
 **We don't add bins to Tokyo. We unlock the ones that are already there.**
 

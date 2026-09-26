@@ -98,3 +98,21 @@ export function SectionTitle({ children }: { children: React.ReactNode }) {
     </h2>
   );
 }
+
+/** Labelled form field wrapper. */
+export function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="font-display text-xs font-extrabold uppercase tracking-wide text-muted">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}

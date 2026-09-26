@@ -4,5 +4,7 @@
   "ethName": "gomigo.eth",
   "ethOwner": "0xB8194BD8F2f76bBd18aA762D376fAD31d01303Da",
   "ethRegisterTx": "0xdf2fa1f1f94c69788143227ba6b5960c2e629de3a54538e0b670859c5176b90b",
-  "duration": "31536000"
+  "duration": "31536000",
+  "ethName2": "gomigo.eth",
+  "gomigoWireTx": "0x45fd1315dedecbca173fc594348982bccff938b5a166a334317c984d2abe34e4"
 }

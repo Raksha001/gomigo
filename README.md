@@ -35,9 +35,15 @@ shared infrastructure. Three actors:
 
 | Actor | Does | Gets |
 | --- | --- | --- |
-| 🧳 **Disposer** (tourist) | Finds a nearby bin, proves humanity with World ID, unlocks a 10-min PIN | A place to throw trash + Gomi Points |
+| 🧳 **Disposer** (tourist) | Finds a nearby bin, proves humanity with World ID, unlocks a 10-min PIN — **or books a pickup** when no bin is reachable | A place to throw trash + Gomi Points |
 | 🏠 **Host** (shop / home) | Lists their locked bin as an ENS subname, sets records | **¥ per verified drop-off** |
-| 🚛 **Collector** (gig worker) | Empties bins that are marked FULL | **¥ per pickup** |
+| 🚛 **Collector** (gig worker) | Accepts a disposer's **pickup request**, takes their trash, and deposits it into a host bin using their scoped ENS role | **Crypto (USDC) per pickup** |
+
+**Two ways to dispose.** If a bin is nearby, the disposer unlocks it directly
+(World ID → PIN). If not — too much trash, in a hurry, no bin around, or unsure of
+Japan's strict sorting — they **book a collector**, who picks the trash up and
+deposits it into an ENS-registered host bin, paid in crypto. Either way the trash
+lands in a licensed bin, and every actor is a verified/rate-limited participant.
 
 The unlock only happens behind a **World ID proof** (Sybil-safe, private) and every
 bin's identity + live state lives in **ENSv2** (self-owned, addressable, role-gated).
@@ -57,12 +63,13 @@ bin's identity + live state lives in **ENSv2** (self-owned, addressable, role-ga
 | Route | Screen |
 | --- | --- |
 | `/` | Landing — problem → solution → role picker |
-| `/disposer` | Map (geolocation) + nearest-bin list, ward filter |
-| `/bin/[id]` | Bin detail — ENS records, host earnings, reviews, verify + judge sim |
-| `/pass` | Active access pass — big PIN, countdown ring, unlock directions, confetti |
+| `/disposer` | Map (geolocation) + nearest-bin list, ward filter, "request a pickup" |
+| `/bin/[id]` | Bin detail — live ENSv2 registration + EAC roles, host earnings, reviews, verify + judge sim |
+| `/pickup` | Book a collector — meet-spot, items, reason, USDC offer (disposer with no bin nearby) |
+| `/pass` | Active access pass — big PIN, countdown ring, access-mode instructions, confetti |
 | `/host` | Host dashboard — earnings, EAC roles, bin status toggles (ENS writes) |
-| `/host/new` | List-a-bin flow — mint an ENSv2 subname + set records |
-| `/collector` | Collector gigs — full bins, accept & empty (constrained ENS write), payouts |
+| `/host/new` | List-a-bin flow — registers a real ENSv2 subname on-chain + delegates EAC role |
+| `/collector` | Pickup board — accept requests, deposit into a host bin, earn USDC (simulated) |
 | `/profile` | Disposer profile — level, streak, impact, drop history |
 
 ---
@@ -186,9 +193,9 @@ See [lib/ensv2.ts](lib/ensv2.ts) and [scripts/ens/](scripts/ens/).
 
 | Thing | Address / proof |
 | --- | --- |
-| **`gomigo.eth`** — registered via ENSv2 ETHRegistrar (commit-reveal, paid in test USDC) | owner [`0xB819…03Da`](https://sepolia.etherscan.io/tx/0xdf2fa1f1f94c69788143227ba6b5960c2e629de3a54538e0b670859c5176b90b) |
+| **`gomigo.eth`** — registered via ENSv2 ETHRegistrar (commit-reveal, paid in test USDC) | owner `0xB819…03Da` · [register tx `0x52ef…bcc9`](https://sepolia.etherscan.io/tx/0x52ef8c9e87d19f58d40b9df1974cc47a93502f2da2e215d43b7f1168a104bcc9) |
 | **Our subname registry** (VerifiableFactory proxy of ENS's `UserRegistryImpl`) | [`0x6Fdec1496fe8ff0c07b815d72A53A014d6072ff6`](https://sepolia.etherscan.io/address/0x6Fdec1496fe8ff0c07b815d72A53A014d6072ff6) |
-| **`setSubregistry`** — `gomigo.eth` → our registry (wildcard routing) | [`0x9ec8…cfe6`](https://sepolia.etherscan.io/tx/0x9ec8aa41e44e2f5f939aa7dcfb1b7c06a9b93735c6b783e06925a1d2e937cfe6) |
+| **`setSubregistry`** — `gomigo.eth` → our registry (wildcard routing) | [wire tx `0x45fd…34e4`](https://sepolia.etherscan.io/tx/0x45fd1315dedecbca173fc594348982bccff938b5a166a334317c984d2abe34e4) |
 | **Tokenized bin subnames** | `bin-01-shibuya`, `bin-02-shibuya`, `bin-01-chiyoda`, `bin-01-shinjuku`, `bin-02-shinjuku` — all `getState → REGISTERED` |
 
 **Hierarchical resolution ✅** — `gomigo.eth` (2LD we own in the ETHRegistry) points
@@ -218,9 +225,11 @@ we run on-chain — owning the 2LD, our own subname registry, hierarchical wirin
 tokenized subnames, and live EAC scoped-role delegation — is all verifiable on
 Sepolia.
 
-**Reproduce:** `1-deploy-registry` → `4-seed-bins`/`5-finish` → `6-register-eth` →
-`7-wire-subregistry` in [scripts/ens/](scripts/ens/) (needs a funded
-`DEPLOYER_PRIVATE_KEY` in `.env.local`).
+**Reproduce:** `1-deploy-registry` → `4-seed-bins`/`5-finish` → `8-register-gomigo`
+(registers `gomigo.eth` + wires the subregistry) in [scripts/ens/](scripts/ens/)
+(needs a funded `DEPLOYER_PRIVATE_KEY` in `.env.local`). New bins also register live
+on-chain from the **Host → List a bin** flow via [app/api/ens/register](app/api/ens/register/route.ts),
+and you can verify the whole deployment any time with `node scripts/ens/verify.mjs`.
 
 ---
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { LocateFixed, Navigation } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { DEFAULT_LOCATION, distanceMeters, walkLabel } from "@/lib/data";
@@ -104,6 +105,21 @@ export default function DisposerPage() {
         <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full border border-ink bg-sky" /> You</span>
         <span className="ml-auto">Tap a pin to open</span>
       </div>
+
+      {/* No bin nearby? Book a pickup */}
+      <Link
+        href="/pickup"
+        className="press flex items-center gap-3 rounded-3xl border-4 border-ink bg-sky p-3 shadow-comic"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-[3px] border-ink bg-white text-2xl">
+          🚚
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-sm font-extrabold text-ink">No bin nearby? Request a pickup</p>
+          <p className="text-[11px] font-bold text-ink/70">A verified collector takes your trash · paid in crypto</p>
+        </div>
+        <span className="font-display text-lg font-extrabold text-ink">→</span>
+      </Link>
 
       {/* Ward filter */}
       <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1">

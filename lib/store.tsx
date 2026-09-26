@@ -22,13 +22,11 @@ import {
   type ReactNode,
 } from "react";
 import {
-  COLLECTOR_PAYOUT,
   HOST_SHARE,
   POINTS_PER_DROP,
   seedBins,
   seedProfile,
   seedPickups,
-  HOST_DEPOSIT_SHARE_USDC,
   type AccessType,
   type Bin,
   type DropEvent,
@@ -68,15 +66,6 @@ export interface VerifyResponse {
   simulated?: boolean;
   code?: string;
   error?: string;
-}
-
-interface CollectorJob {
-  id: string;
-  binId: string;
-  binLabel: string;
-  ward: string;
-  payout: number;
-  at: number;
 }
 
 interface StoreValue {
@@ -217,33 +206,56 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setBins((prev) => [bin, ...prev]);
   }, []);
 
-  const collectBin = useCallback(
-    (binId: string) => {
-      const bin = bins.find((b) => b.id === binId);
-      setBins((prev) =>
-        prev.map((b) =>
-          b.id === binId ? { ...b, status: "AVAILABLE", capacity: 0 } : b,
-        ),
+  // --- Pickup marketplace ---------------------------------------------------
+
+  const requestPickup = useCallback<StoreValue["requestPickup"]>((input) => {
+    setPickups((prev) => [
+      {
+        id: `pk-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        by: "You",
+        emoji: "🧳",
+        ward: input.ward,
+        where: input.where,
+        items: input.items,
+        reason: input.reason,
+        feeUsdc: input.feeUsdc,
+        status: "open",
+        createdAt: Date.now(),
+      },
+      ...prev,
+    ]);
+  }, []);
+
+  const acceptPickup = useCallback((id: string) => {
+    setPickups((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, status: "accepted", collector: "You" } : p,
+      ),
+    );
+  }, []);
+
+  const completePickup = useCallback((id: string, binId: string) => {
+    // Collector deposits into a host bin → collector paid in crypto, host earns.
+    setPickups((prev) => {
+      const p = prev.find((x) => x.id === id);
+      if (p) setCollectorUsdc((u) => Math.round((u + p.feeUsdc) * 100) / 100);
+      return prev.map((x) =>
+        x.id === id ? { ...x, status: "completed", binId } : x,
       );
-      setCollectorEarnings((e) => e + COLLECTOR_PAYOUT);
-      if (bin) {
-        setCollectorJobs((jobs) =>
-          [
-            {
-              id: `${binId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-              binId,
-              binLabel: bin.label,
-              ward: bin.ward,
-              payout: COLLECTOR_PAYOUT,
-              at: Date.now(),
-            },
-            ...jobs,
-          ].slice(0, 20),
-        );
-      }
-    },
-    [bins],
-  );
+    });
+    setBins((prev) =>
+      prev.map((b) =>
+        b.id === binId
+          ? {
+              ...b,
+              dropCount: b.dropCount + 1,
+              capacity: Math.min(100, b.capacity + 3),
+              earnings: b.earnings + Math.round(b.pricePerDrop * HOST_SHARE),
+            }
+          : b,
+      ),
+    );
+  }, []);
 
   const addReview = useCallback((binId: string, review: Review) => {
     setBins((prev) =>
@@ -264,8 +276,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       history,
       activePass,
       lastError,
-      collectorEarnings,
-      collectorJobs,
+      collectorUsdc,
+      pickups,
       location,
       getBin,
       setLocation,
@@ -274,8 +286,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearPass,
       toggleStatus,
       addBin,
-      collectBin,
       addReview,
+      requestPickup,
+      acceptPickup,
+      completePickup,
     }),
     [
       bins,
@@ -283,8 +297,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       history,
       activePass,
       lastError,
-      collectorEarnings,
-      collectorJobs,
+      collectorUsdc,
+      pickups,
       location,
       getBin,
       setLocation,
@@ -293,8 +307,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearPass,
       toggleStatus,
       addBin,
-      collectBin,
       addReview,
+      requestPickup,
+      acceptPickup,
+      completePickup,
     ],
   );
 

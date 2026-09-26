@@ -96,7 +96,7 @@ export default function Landing() {
           href="/collector"
           emoji="🚛"
           title="I'll collect the trash"
-          sub="Gig worker — empty full bins, get paid"
+          sub="Gig worker — pick up trash from tourists, earn crypto"
           color="bg-sky text-ink"
         />
       </section>

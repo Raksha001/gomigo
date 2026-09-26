@@ -37,9 +37,7 @@ const APP_ID = (process.env.NEXT_PUBLIC_WLD_APP_ID ||
   "app_gomigo") as `app_${string}`;
 const ACTION = process.env.NEXT_PUBLIC_WLD_ACTION || "gomigo-dropoff";
 // "production" (real World App) | "staging" | "sandbox" (Sandbox World App build).
-const ENV = (process.env.NEXT_PUBLIC_WLD_ENV as
-  | "production"
-  | "staging"
+const ENV = (process.env.NEXT_PUBLIC_WLD_ENV as "staging"
   | "sandbox") || "production";
 
 export default function DropoffModal({

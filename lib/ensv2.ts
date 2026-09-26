@@ -164,13 +164,13 @@ export function labelToAnyId(label: string): bigint {
 
 /**
  * Read a contract call across several Sepolia RPCs, returning the first success.
- * Public RPCs (1rpc.io etc.) rate-limit browser reads, so we fall back rather
- * than let a single throttled endpoint blank out the on-chain UI.
+ * CORS-friendly endpoints go first: browser reads on 1rpc.io are blocked by CORS,
+ * so publicnode/drpc must lead or the on-chain UI blanks out.
  */
 const READ_RPCS = [
-  SEPOLIA_RPC_URL,
   "https://ethereum-sepolia.publicnode.com",
   "https://sepolia.drpc.org",
+  SEPOLIA_RPC_URL,
   "https://1rpc.io/sepolia",
 ].filter((v, i, a) => v && a.indexOf(v) === i) as string[];
 

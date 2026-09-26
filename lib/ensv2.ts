@@ -160,18 +160,45 @@ export function labelToAnyId(label: string): bigint {
 }
 
 /**
+ * Read a contract call across several Sepolia RPCs, returning the first success.
+ * Public RPCs (1rpc.io etc.) rate-limit browser reads, so we fall back rather
+ * than let a single throttled endpoint blank out the on-chain UI.
+ */
+const READ_RPCS = [
+  SEPOLIA_RPC_URL,
+  "https://ethereum-sepolia.publicnode.com",
+  "https://sepolia.drpc.org",
+  "https://1rpc.io/sepolia",
+].filter((v, i, a) => v && a.indexOf(v) === i) as string[];
+
+async function readWithFallback<T>(
+  params: Parameters<PublicClient["readContract"]>[0],
+): Promise<T> {
+  let lastErr: unknown;
+  for (const url of READ_RPCS) {
+    try {
+      const client = createPublicClient({ chain: sepolia, transport: http(url) });
+      return (await client.readContract(params)) as T;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
+/**
  * Read a bin subname's live registration state from our ENSv2 registry on
- * Sepolia. Returns null if the read fails (so the UI can fall back gracefully).
+ * Sepolia. Returns null if all RPCs fail (so the UI can fall back gracefully).
  */
 export async function readOnchainBin(label: string): Promise<OnchainBin | null> {
   try {
     const anyId = labelToAnyId(label);
-    const [status, expiry] = (await getPublicClient().readContract({
+    const [status, expiry] = await readWithFallback<readonly [number, bigint, bigint]>({
       address: ENS_REGISTRY_ADDRESS,
       abi: REGISTRY_ABI,
       functionName: "getState",
       args: [anyId],
-    })) as readonly [number, bigint, bigint];
+    });
     return {
       label,
       anyId: `0x${anyId.toString(16)}`,
@@ -194,12 +221,12 @@ export async function readHasRole(
   account: Address,
 ): Promise<boolean | null> {
   try {
-    return (await getPublicClient().readContract({
+    return await readWithFallback<boolean>({
       address: ENS_REGISTRY_ADDRESS,
       abi: REGISTRY_ABI,
       functionName: "hasRoles",
       args: [labelToAnyId(label), role, account],
-    })) as boolean;
+    });
   } catch {
     return null;
   }
